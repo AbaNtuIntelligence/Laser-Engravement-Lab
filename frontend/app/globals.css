@@ -1,0 +1,289 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   LASER ENGRAVING STORE
+   Global Mobile-First Design System
+   ============================================================ */
+
+:root {
+  --store-ink: #171614;
+  --store-muted: #706c64;
+  --store-soft: #a19b90;
+  --store-paper: #f7f5f0;
+  --store-surface: #ffffff;
+  --store-line: #e6e1d8;
+  --store-accent: #a17a3f;
+  --store-accent-dark: #795a2e;
+  --store-dark: #11110f;
+}
+
+/* ------------------------------------------------------------
+   RESET
+   ------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--store-paper);
+  color: var(--store-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+img {
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------------
+   MOBILE-FIRST CONTAINER
+   ------------------------------------------------------------ */
+
+.store-container {
+  width: min(100% - 32px, 1440px);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .store-container {
+    width: min(100% - 40px, 1440px);
+  }
+}
+
+@media (min-width: 768px) {
+  .store-container {
+    width: min(100% - 64px, 1440px);
+  }
+}
+
+/* ------------------------------------------------------------
+   SECTIONS
+   ------------------------------------------------------------ */
+
+.store-section {
+  padding-block: 56px;
+}
+
+@media (min-width: 640px) {
+  .store-section {
+    padding-block: 68px;
+  }
+}
+
+@media (min-width: 768px) {
+  .store-section {
+    padding-block: 96px;
+  }
+}
+
+/* ------------------------------------------------------------
+   TYPOGRAPHY
+   ------------------------------------------------------------ */
+
+.store-eyebrow {
+  margin: 0 0 10px;
+
+  color: var(--store-accent);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+
+  text-transform: uppercase;
+}
+
+@media (min-width: 640px) {
+  .store-eyebrow {
+    font-size: 11px;
+  }
+}
+
+.store-heading {
+  margin: 0;
+
+  color: var(--store-ink);
+
+  font-size: clamp(30px, 8vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.store-description {
+  max-width: 620px;
+
+  margin-top: 16px;
+
+  color: var(--store-muted);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+@media (min-width: 768px) {
+  .store-description {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+}
+
+/* ------------------------------------------------------------
+   HORIZONTAL TOUCH RAILS
+   ------------------------------------------------------------ */
+
+.store-horizontal-rail {
+  display: flex;
+
+  gap: 12px;
+
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  overscroll-behavior-inline: contain;
+
+  padding-bottom: 8px;
+
+  scrollbar-width: none;
+
+  scroll-snap-type: x mandatory;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.store-horizontal-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.store-horizontal-rail > * {
+  flex: 0 0 auto;
+
+  scroll-snap-align: start;
+}
+
+/* ------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------ */
+
+.store-button {
+  display: inline-flex;
+
+  min-height: 48px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 1px solid transparent;
+
+  padding: 0 20px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  white-space: nowrap;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.store-button:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .store-button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.store-button-dark {
+  background: var(--store-ink);
+  color: white;
+}
+
+.store-button-dark:hover {
+  background: #292722;
+}
+
+.store-button-light {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: white;
+}
+
+.store-button-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.store-button-outline {
+  border-color: var(--store-line);
+  background: transparent;
+  color: var(--store-ink);
+}
+
+.store-button-outline:hover {
+  border-color: var(--store-ink);
+}
+
+/* ------------------------------------------------------------
+   MOBILE TOUCH TARGETS
+   ------------------------------------------------------------ */
+
+@media (max-width: 639px) {
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ------------------------------------------------------------
+   SAFE SELECTION
+   ------------------------------------------------------------ */
+
+::selection {
+  background: var(--store-ink);
+  color: white;
+}
