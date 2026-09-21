@@ -10,31 +10,34 @@ ENV/
 # Django
 db.sqlite3
 staticfiles/
-
 # Environment / secrets
 .env
 .env.*
 !.env.example
-
 # Node / Next.js
 node_modules/
 .next/
 out/
-
 # Logs
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
-
 # Editor / OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
 # Archives
 *.zip
-
 # Credentials
 credentials/
 secrets/
+# OAuth client credentials
+oauth-client.json
+
+# Google OAuth token
+/oauth-token.json
+
+# OAuth client credentialsoauth-client.json
+
+# Local Google OAuth authorization helperauthorize_google.py

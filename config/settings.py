@@ -18,6 +18,10 @@ GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
 
 GOOGLE_ACCESS_TOKEN = os.getenv("GOOGLE_ACCESS_TOKEN")
 
+GOOGLE_OAUTH_TOKEN_FILE = os.getenv(
+    "GOOGLE_OAUTH_TOKEN_FILE",
+    str(BASE_DIR / "oauth-token.json"),
+)
 # ============================================================
 # SECURITY
 # ============================================================
@@ -33,6 +37,11 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
 ]
+
+if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(
+        os.getenv("RENDER_EXTERNAL_HOSTNAME")
+    )
 
 
 # ============================================================

@@ -1,7 +1,8 @@
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 from django.conf import settings
-from google.auth import default
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 
@@ -38,26 +39,46 @@ EXPECTED_HEADERS = [
 
 def get_google_credentials():
     """
-    Use Google Application Default Credentials (ADC).
-
-    Local development:
-        Uses the credentials configured by:
-        gcloud auth application-default login
-
-    Production:
-        Can use the platform's configured Google credentials.
+    Load Google OAuth credentials from the local/production token file.
     """
 
-    credentials, project_id = default(
-        scopes=SCOPES
+    token_file = getattr(
+        settings,
+        "GOOGLE_OAUTH_TOKEN_FILE",
+        None,
     )
+
+    if not token_file:
+        token_file = Path(settings.BASE_DIR) / "oauth-token.json"
+
+    token_file = Path(token_file)
+
+    if not token_file.exists():
+        raise RuntimeError(
+            f"Google OAuth token file was not found: {token_file}"
+        )
+
+    credentials = Credentials.from_authorized_user_file(
+        str(token_file),
+        SCOPES,
+    )
+
+    if not credentials:
+        raise RuntimeError(
+            "Google OAuth credentials could not be loaded."
+        )
+
+    if not credentials.refresh_token:
+        raise RuntimeError(
+            "Google OAuth credentials do not contain a refresh token."
+        )
 
     return credentials
 
 
 def get_sheet_values():
     """
-    Read the complete Products worksheet from Google Sheets.
+    Read all catalogue rows from the Products sheet.
     """
 
     credentials = get_google_credentials()
@@ -88,190 +109,229 @@ def get_sheet_values():
     return result.get("values", [])
 
 
-def normalize_text(value):
+def parse_boolean(value):
     """
-    Convert a spreadsheet value into clean text.
-    """
-
-    if value is None:
-        return ""
-
-    return str(value).strip()
-
-
-def normalize_nullable_text(value):
-    """
-    Return cleaned text or None when the value is empty.
-    """
-
-    value = normalize_text(value)
-
-    return value if value else None
-
-
-def normalize_boolean(value, default=False):
-    """
-    Convert common Google Sheets boolean representations
-    into Python booleans.
+    Convert common spreadsheet boolean values to Python booleans.
     """
 
     if isinstance(value, bool):
         return value
 
-    value = normalize_text(value).lower()
-
-    if value in {"true", "yes", "1", "on"}:
-        return True
-
-    if value in {"false", "no", "0", "off", ""}:
+    if value is None:
         return False
 
-    return default
+    value = str(value).strip().lower()
+
+    return value in {
+        "true",
+        "1",
+        "yes",
+        "y",
+    }
 
 
-def normalize_integer(value, default=0):
+def parse_integer(value, default=0):
     """
-    Convert a spreadsheet value into an integer.
+    Safely convert a spreadsheet value to an integer.
     """
 
-    value = normalize_text(value)
-
-    if not value:
+    if value is None or str(value).strip() == "":
         return default
 
     try:
-        return int(float(value))
+        return int(float(str(value).strip()))
     except (ValueError, TypeError):
         return default
 
 
-def normalize_decimal(value, default=None):
+def parse_decimal(value):
     """
-    Convert a spreadsheet value into a decimal number.
+    Safely convert a spreadsheet price to Decimal.
     """
 
-    value = normalize_text(value)
-
-    if not value:
-        return default
+    if value is None or str(value).strip() == "":
+        return None
 
     try:
-        return float(Decimal(value))
+        return Decimal(str(value).strip())
     except (InvalidOperation, ValueError, TypeError):
-        return default
+        return None
 
 
-def get_cell(row, index):
+def get_value(row, index, default=""):
     """
-    Safely retrieve a cell from a row.
-
-    Google Sheets omits trailing empty cells, so we
-    must never assume every row contains 22 values.
+    Safely retrieve a column value from a spreadsheet row.
     """
 
     if index >= len(row):
-        return ""
+        return default
 
-    return row[index]
+    value = row[index]
+
+    if value is None:
+        return default
+
+    return str(value).strip()
 
 
-def normalize_product(row):
+def normalize_header(header):
     """
-    Convert one raw Google Sheets row into the public
-    Django catalogue Product contract.
+    Normalize a spreadsheet header for reliable matching.
+
+    This allows harmless formatting differences such as:
+
+        Feature1
+        Feature 1
+
+    to be treated as the same column.
     """
 
-    return {
-        "id": normalize_text(get_cell(row, 0)),
-        "name": normalize_text(get_cell(row, 1)),
-        "category": normalize_text(get_cell(row, 2)),
-        "subcategory": normalize_nullable_text(get_cell(row, 3)),
-        "brand": normalize_nullable_text(get_cell(row, 4)),
-        "sku": normalize_text(get_cell(row, 5)),
-        "slug": normalize_text(get_cell(row, 6)),
-        "unit": normalize_text(get_cell(row, 7)) or "each",
+    return (
+        str(header)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("_", "")
+        .replace("-", "")
+    )
 
-        "price": normalize_decimal(
-            get_cell(row, 8)
+
+def normalize_product(row, header_map):
+    """
+    Convert one Google Sheets row into the API product structure.
+    """
+
+    def value(column, default=""):
+        normalized_column = normalize_header(column)
+        index = header_map.get(normalized_column)
+
+        if index is None:
+            return default
+
+        return get_value(
+            row,
+            index,
+            default,
+        )
+
+    product = {
+        "id": parse_integer(
+            value("ID"),
+            default=0,
         ),
 
-        "compare_price": normalize_decimal(
-            get_cell(row, 9)
+        "name": value("Product Name"),
+
+        "category": value("Category"),
+
+        "subcategory": value("Subcategory"),
+
+        "brand": value("Brand"),
+
+        "sku": value("SKU"),
+
+        "slug": value("Slug"),
+
+        "unit": value("Unit"),
+
+        "price": parse_decimal(
+            value("Price")
         ),
 
-        "featured": normalize_boolean(
-            get_cell(row, 10)
+        "compare_price": parse_decimal(
+            value("Compare Price")
         ),
 
-        "new_arrival": normalize_boolean(
-            get_cell(row, 11)
+        "featured": parse_boolean(
+            value("Featured")
         ),
 
-        "active": normalize_boolean(
-            get_cell(row, 12),
-            default=True,
+        "new_arrival": parse_boolean(
+            value("New Arrival")
         ),
 
-        "stock": normalize_integer(
-            get_cell(row, 13)
+        "active": parse_boolean(
+            value("Active")
+        ),
+
+        "stock": parse_integer(
+            value("Stock"),
+            default=0,
         ),
 
         "images": [
             image
             for image in [
-                normalize_nullable_text(get_cell(row, 14)),
-                normalize_nullable_text(get_cell(row, 15)),
-                normalize_nullable_text(get_cell(row, 16)),
+                value("Image 1"),
+                value("Image 2"),
+                value("Image 3"),
             ]
             if image
         ],
 
-        "description": normalize_text(
-            get_cell(row, 17)
-        ),
+        "description": value("Description"),
 
         "features": [
             feature
             for feature in [
-                normalize_nullable_text(get_cell(row, 18)),
-                normalize_nullable_text(get_cell(row, 19)),
-                normalize_nullable_text(get_cell(row, 20)),
-                normalize_nullable_text(get_cell(row, 21)),
+                value("Feature 1"),
+                value("Feature 2"),
+                value("Feature 3"),
+                value("Feature 4"),
             ]
             if feature
         ],
     }
 
+    return product
+
 
 def get_products():
     """
-    Read and normalize active products from Google Sheets.
+    Read, normalize, and return active products from Google Sheets.
     """
 
-    values = get_sheet_values()
+    rows = get_sheet_values()
 
-    if not values:
+    if not rows:
         return []
 
-    headers = values[0]
+    headers = [
+        str(header).strip()
+        for header in rows[0]
+    ]
 
-    if headers != EXPECTED_HEADERS:
+    header_map = {
+        normalize_header(header): index
+        for index, header in enumerate(headers)
+    }
+
+    missing_headers = [
+        header
+        for header in EXPECTED_HEADERS
+        if normalize_header(header) not in header_map
+    ]
+
+    if missing_headers:
         raise RuntimeError(
-            "Google Sheets Products header does not match "
-            "the expected 22-column catalogue schema."
+            "Google Sheets catalogue is missing expected columns: "
+            + ", ".join(missing_headers)
         )
 
     products = []
 
-    for row in values[1:]:
-        product = normalize_product(row)
+    for row in rows[1:]:
+        product = normalize_product(
+            row,
+            header_map,
+        )
 
-        # Completely empty rows are ignored.
-        if not product["id"] and not product["name"]:
+        if not product["id"]:
             continue
 
-        # Inactive products are kept in Sheets but hidden
-        # from the public catalogue.
+        if not product["name"]:
+            continue
+
         if not product["active"]:
             continue
 
