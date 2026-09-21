@@ -16,6 +16,8 @@ load_dotenv(BASE_DIR / ".env")
 
 GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
 
+GOOGLE_ACCESS_TOKEN = os.getenv("GOOGLE_ACCESS_TOKEN")
+
 # ============================================================
 # SECURITY
 # ============================================================

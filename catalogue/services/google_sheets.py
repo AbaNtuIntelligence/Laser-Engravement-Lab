@@ -1,14 +1,14 @@
-import subprocess
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
-from google.oauth2.credentials import Credentials
+from google.auth import default
 from googleapiclient.discovery import build
 
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
 ]
+
 
 EXPECTED_HEADERS = [
     "ID",
@@ -36,78 +36,23 @@ EXPECTED_HEADERS = [
 ]
 
 
-def get_gcloud_access_token():
-    """
-    Get a temporary Google OAuth access token from the
-    currently authenticated gcloud account.
-    """
-
-    gcloud_path = (
-        r"C:\Users\User\AppData\Local\Google\Cloud SDK"
-        r"\google-cloud-sdk\bin\gcloud.cmd"
-    )
-
-    result = subprocess.run(
-        [
-            gcloud_path,
-            "auth",
-            "print-access-token",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-
-    token = result.stdout.strip()
-
-    if not token:
-        raise RuntimeError(
-            "gcloud returned an empty access token."
-        )
-
-    return token
-
-    result = subprocess.run(
-        [
-            gcloud_path,
-            "auth",
-            "print-access-token",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-
-    token = result.stdout.strip()
-
-    if not token:
-        raise RuntimeError(
-            "gcloud returned an empty access token."
-        )
-
-    return token
-
-    token = result.stdout.strip()
-
-    if not token:
-        raise RuntimeError(
-            "gcloud returned an empty access token."
-        )
-
-    return token
-
-
 def get_google_credentials():
     """
-    Build Google API credentials from the gcloud access token.
+    Use Google Application Default Credentials (ADC).
+
+    Local development:
+        Uses the credentials configured by:
+        gcloud auth application-default login
+
+    Production:
+        Can use the platform's configured Google credentials.
     """
 
-    token = get_gcloud_access_token()
-
-    return Credentials(
-        token=token,
-        scopes=SCOPES,
+    credentials, project_id = default(
+        scopes=SCOPES
     )
+
+    return credentials
 
 
 def get_sheet_values():
@@ -124,6 +69,11 @@ def get_sheet_values():
     )
 
     spreadsheet_id = settings.GOOGLE_SHEET_ID
+
+    if not spreadsheet_id:
+        raise RuntimeError(
+            "GOOGLE_SHEET_ID is not configured."
+        )
 
     result = (
         service.spreadsheets()
