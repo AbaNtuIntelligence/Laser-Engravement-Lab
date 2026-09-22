@@ -9,14 +9,6 @@ from .pdf_generator import build_catalogue_pdf
 
 
 def parse_boolean_filter(value):
-    """
-    Convert a query-string boolean into a Python boolean.
-
-    Returns:
-        True / False when valid
-        None when no valid filter was supplied
-    """
-
     if value is None:
         return None
 
@@ -33,7 +25,6 @@ def parse_boolean_filter(value):
 
 @api_view(["GET"])
 def products(request):
-
     try:
         products = get_products()
 
@@ -73,7 +64,6 @@ def products(request):
             ]
 
         if featured is not None:
-
             products = [
                 product
                 for product in products
@@ -81,7 +71,6 @@ def products(request):
             ]
 
         if new_arrival is not None:
-
             products = [
                 product
                 for product in products
@@ -89,7 +78,6 @@ def products(request):
             ]
 
         if search:
-
             search = search.strip().lower()
 
             products = [
@@ -113,10 +101,10 @@ def products(request):
         })
 
     except Exception as error:
-
         return Response(
             {
                 "success": False,
+                "error_type": type(error).__name__,
                 "error": str(error),
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -125,9 +113,7 @@ def products(request):
 
 @api_view(["GET"])
 def download_catalogue(request):
-
     try:
-
         products = get_products()
 
         pdf_buffer = build_catalogue_pdf(products)
@@ -144,11 +130,29 @@ def download_catalogue(request):
         return response
 
     except Exception as error:
-
         return Response(
             {
                 "success": False,
+                "error_type": type(error).__name__,
                 "error": str(error),
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@api_view(["GET"])
+def pdf_diagnostic(request):
+    from catalogue.pdf_generator import (
+        BASE_DIR,
+        FRONTEND_PUBLIC,
+        IMAGES_DIR,
+        LOGO_PATH,
+    )
+
+    return Response({
+        "base_dir": str(BASE_DIR),
+        "frontend_public_exists": FRONTEND_PUBLIC.exists(),
+        "images_dir_exists": IMAGES_DIR.exists(),
+        "logo_exists": LOGO_PATH.exists(),
+        "logo_path": str(LOGO_PATH),
+    })
