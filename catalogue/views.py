@@ -213,3 +213,80 @@ def pdf_test(request):
             },
             status=500,
         )
+
+
+@api_view(["GET"])
+def pdf_product_test(request):
+    try:
+        products = get_products()
+
+        start_value = request.query_params.get(
+            "start",
+            "0",
+        )
+
+        count_value = request.query_params.get(
+            "count",
+            "1",
+        )
+
+        try:
+            start = int(start_value)
+        except ValueError:
+            start = 0
+
+        try:
+            count = int(count_value)
+        except ValueError:
+            count = 1
+
+        if start < 0:
+            start = 0
+
+        if count < 1:
+            count = 1
+
+        if start >= len(products):
+            return Response(
+                {
+                    "success": False,
+                    "error": "Start position is outside the catalogue.",
+                    "products": len(products),
+                    "start": start,
+                },
+                status=400,
+            )
+
+        selected_products = products[
+            start:start + count
+        ]
+
+        pdf_buffer = build_catalogue_pdf(
+            selected_products
+        )
+
+        selected_names = [
+            product["name"]
+            for product in selected_products
+        ]
+
+        return Response({
+            "success": True,
+            "start": start,
+            "count": count,
+            "actual_count": len(selected_products),
+            "products": selected_names,
+            "pdf_bytes": len(
+                pdf_buffer.getvalue()
+            ),
+        })
+
+    except Exception as error:
+        return Response(
+            {
+                "success": False,
+                "error_type": type(error).__name__,
+                "error": str(error),
+            },
+            status=500,
+        )

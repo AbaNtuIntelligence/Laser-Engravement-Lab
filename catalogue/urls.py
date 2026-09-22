@@ -5,6 +5,7 @@ from .views import (
     download_catalogue,
     pdf_diagnostic,
     pdf_test,
+    pdf_product_test,
 )
 
 
@@ -28,5 +29,10 @@ urlpatterns = [
         "pdf-test/",
         pdf_test,
         name="pdf_test",
+    ),
+    path(
+        "pdf-product-test/",
+        pdf_product_test,
+        name="pdf_product_test",
     ),
 ]
