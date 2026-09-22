@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -110,7 +110,6 @@ def products(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-
 @api_view(["GET"])
 def download_catalogue(request):
     try:
@@ -118,8 +117,8 @@ def download_catalogue(request):
 
         pdf_buffer = build_catalogue_pdf(products)
 
-        response = HttpResponse(
-            pdf_buffer.getvalue(),
+        response = FileResponse(
+            pdf_buffer,
             content_type="application/pdf",
         )
 
@@ -138,7 +137,6 @@ def download_catalogue(request):
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
 
 @api_view(["GET"])
 def pdf_diagnostic(request):
