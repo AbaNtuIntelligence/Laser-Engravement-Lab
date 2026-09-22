@@ -143,22 +143,17 @@ def download_catalogue(request):
 @api_view(["GET"])
 def pdf_diagnostic(request):
     from catalogue.pdf_generator import (
-        BASE_DIR,
         FRONTEND_PUBLIC,
         IMAGES_DIR,
         LOGO_PATH,
-        build_catalogue_pdf,
     )
 
     try:
         products = get_products()
 
-        pdf_buffer = build_catalogue_pdf(products)
-
         return Response({
             "success": True,
             "products": len(products),
-            "pdf_bytes": len(pdf_buffer.getvalue()),
             "frontend_public_exists": FRONTEND_PUBLIC.exists(),
             "images_dir_exists": IMAGES_DIR.exists(),
             "logo_exists": LOGO_PATH.exists(),
@@ -174,10 +169,47 @@ def pdf_diagnostic(request):
             status=500,
         )
 
-    return Response({
-        "base_dir": str(BASE_DIR),
-        "frontend_public_exists": FRONTEND_PUBLIC.exists(),
-        "images_dir_exists": IMAGES_DIR.exists(),
-        "logo_exists": LOGO_PATH.exists(),
-        "logo_path": str(LOGO_PATH),
-    })
+
+@api_view(["GET"])
+def pdf_test(request):
+    try:
+        products = get_products()
+
+        requested_count = request.query_params.get(
+            "count",
+            "1",
+        )
+
+        try:
+            count = int(requested_count)
+        except ValueError:
+            count = 1
+
+        if count < 1:
+            count = 1
+
+        if count > len(products):
+            count = len(products)
+
+        selected_products = products[:count]
+
+        pdf_buffer = build_catalogue_pdf(
+            selected_products
+        )
+
+        return Response({
+            "success": True,
+            "requested_count": count,
+            "actual_count": len(selected_products),
+            "pdf_bytes": len(pdf_buffer.getvalue()),
+        })
+
+    except Exception as error:
+        return Response(
+            {
+                "success": False,
+                "error_type": type(error).__name__,
+                "error": str(error),
+            },
+            status=500,
+        )
