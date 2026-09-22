@@ -254,12 +254,19 @@ def resolve_image_path(image_url):
     return None
 
 
-def image_to_png_buffer(image_path):
+def image_to_jpeg_buffer(
+    image_path,
+    max_width_px=900,
+    max_height_px=700,
+    quality=82,
+):
     """
-    Open any supported image with Pillow and convert it
-    to an RGB PNG held in memory.
+    Open an image with Pillow, resize it to a sensible
+    catalogue resolution, and return a compressed JPEG
+    buffer suitable for ReportLab.
 
-    This makes WebP images safe for ReportLab.
+    Resizing before encoding keeps large source images
+    from consuming excessive Render memory.
     """
 
     if not image_path:
@@ -268,20 +275,58 @@ def image_to_png_buffer(image_path):
     try:
         with PILImage.open(image_path) as source:
 
-            image = source.convert("RGB")
+            # Convert images with transparency safely
+            # onto a white background.
+            if source.mode in ("RGBA", "LA") or (
+                source.mode == "P"
+                and "transparency" in source.info
+            ):
+                source = source.convert("RGBA")
+
+                background = PILImage.new(
+                    "RGB",
+                    source.size,
+                    "white",
+                )
+
+                background.paste(
+                    source,
+                    mask=source.getchannel("A"),
+                )
+
+                image = background
+
+            else:
+                image = source.convert("RGB")
+
+            # Resize BEFORE JPEG encoding.
+            image.thumbnail(
+                (
+                    max_width_px,
+                    max_height_px,
+                ),
+                PILImage.Resampling.LANCZOS,
+            )
 
             buffer = BytesIO()
 
             image.save(
                 buffer,
-                format="PNG",
+                format="JPEG",
+                quality=quality,
+                optimize=True,
             )
 
             buffer.seek(0)
 
+            # Explicitly detach the Pillow image from the
+            # source before returning the buffer.
+            image.close()
+
             return buffer
 
     except Exception as error:
+
         print(
             f"[PDF] Could not process image "
             f"{image_path}: {error}"
@@ -294,6 +339,9 @@ def create_product_image(image_url):
     """
     Create a product image that fits inside a fixed
     catalogue image area without stretching.
+
+    Source images are resized before being passed to
+    ReportLab to reduce memory consumption.
     """
 
     image_path = resolve_image_path(image_url)
@@ -306,7 +354,12 @@ def create_product_image(image_url):
 
         return None
 
-    buffer = image_to_png_buffer(image_path)
+    buffer = image_to_jpeg_buffer(
+        image_path,
+        max_width_px=900,
+        max_height_px=700,
+        quality=82,
+    )
 
     if not buffer:
         return None
@@ -320,16 +373,26 @@ def create_product_image(image_url):
         max_width = 76 * mm
         max_height = 60 * mm
 
-        width_ratio = max_width / original_width
-        height_ratio = max_height / original_height
+        width_ratio = (
+            max_width / original_width
+        )
+
+        height_ratio = (
+            max_height / original_height
+        )
 
         scale = min(
             width_ratio,
             height_ratio,
         )
 
-        final_width = original_width * scale
-        final_height = original_height * scale
+        final_width = (
+            original_width * scale
+        )
+
+        final_height = (
+            original_height * scale
+        )
 
         buffer.seek(0)
 
@@ -350,6 +413,8 @@ def create_product_image(image_url):
             f"for {image_path}: {error}"
         )
 
+        buffer.close()
+
         return None
 
 
@@ -361,7 +426,9 @@ def create_image_area(image_url):
     its original aspect ratio.
     """
 
-    product_image = create_product_image(image_url)
+    product_image = create_product_image(
+        image_url
+    )
 
     if product_image:
 
@@ -524,6 +591,23 @@ def draw_header_footer(canvas_obj, document):
                 print(
                     f"[PDF] Header logo error: {error}"
                 )
+
+def image_to_png_buffer(image_path):
+    """
+    Backwards-compatible image helper used by the
+    existing header and cover code.
+
+    Despite the historical name, this now returns
+    an optimized JPEG buffer.
+    """
+
+    return image_to_jpeg_buffer(
+        image_path,
+        max_width_px=1200,
+        max_height_px=900,
+        quality=85,
+    )
+
 
     # --------------------------------------------------------
     # Brand
