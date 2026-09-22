@@ -147,7 +147,32 @@ def pdf_diagnostic(request):
         FRONTEND_PUBLIC,
         IMAGES_DIR,
         LOGO_PATH,
+        build_catalogue_pdf,
     )
+
+    try:
+        products = get_products()
+
+        pdf_buffer = build_catalogue_pdf(products)
+
+        return Response({
+            "success": True,
+            "products": len(products),
+            "pdf_bytes": len(pdf_buffer.getvalue()),
+            "frontend_public_exists": FRONTEND_PUBLIC.exists(),
+            "images_dir_exists": IMAGES_DIR.exists(),
+            "logo_exists": LOGO_PATH.exists(),
+        })
+
+    except Exception as error:
+        return Response(
+            {
+                "success": False,
+                "error_type": type(error).__name__,
+                "error": str(error),
+            },
+            status=500,
+        )
 
     return Response({
         "base_dir": str(BASE_DIR),
