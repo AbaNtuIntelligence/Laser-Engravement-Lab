@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import os
 
 from dotenv import load_dotenv
@@ -270,5 +270,6 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
 
     "http://localhost:3000",
+    "https://engravinglapgiftstore.co.za",
 
 ]

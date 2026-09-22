@@ -24,7 +24,6 @@ function formatPrice(price: number | null) {
 
 export default function RequestQuotePage() {
   const [items, setItems] = useState<QuoteItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
 
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -37,7 +36,7 @@ export default function RequestQuotePage() {
 
   useEffect(() => {
     setItems(getQuoteBasket());
-    setLoaded(true);
+    
 
     function handleBasketUpdate() {
       setItems(getQuoteBasket());

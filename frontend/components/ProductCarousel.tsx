@@ -306,7 +306,7 @@ export default function ProductCarousel({
                 snap-mandatory
               "
             >
-              {products.map((product, index) => (
+             {products.map((product) => (
   <div
     key={product.id}
     className="snap-start"
