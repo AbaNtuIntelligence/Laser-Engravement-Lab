@@ -273,12 +273,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://engravinglapgiftstore.co.za",
     "https://www.engravinglapgiftstore.co.za",
 ]
-CORS_ALLOWED_ORIGINS += [
-    origin.strip()
-    for origin in os.getenv("EXTRA_CORS_ORIGINS", "").split(",")
-    if origin.strip()
-]
-
 # Production security settings
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG

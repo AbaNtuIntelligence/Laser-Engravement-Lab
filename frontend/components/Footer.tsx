@@ -263,7 +263,7 @@ export default function Footer() {
     {/* COMPANY LINK */}
 
     <Link
-      href="https://abantu-website-1.onrender.com/"
+      href="https://https://abantu-intelligence.co.za/"
       target="_blank"
       rel="noopener noreferrer"
       className="
