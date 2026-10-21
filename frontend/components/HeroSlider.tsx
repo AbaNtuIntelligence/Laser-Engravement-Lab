@@ -42,6 +42,14 @@ export default function HeroSlider() {
 
   const slide = slides[active];
 
+useEffect(() => {
+  const nextIndex = (active + 1) % slides.length;
+  const nextImage = new window.Image();
+
+  nextImage.src = slides[nextIndex].image;
+}, [active]);
+
+
   return (
     <section className="relative min-h-[500px] overflow-hidden bg-[var(--store-dark)] md:min-h-[58vh]">
 
@@ -49,11 +57,16 @@ export default function HeroSlider() {
 
       <div className="absolute inset-0">
 
-        <img
-          src={slide.image}
-          alt=""
-          className="h-full w-full object-cover object-center transition-opacity duration-700"
-        />
+       
+<img
+  src={slide.image}
+  alt=""
+  loading="eager"
+  fetchPriority={active === 0 ? "high" : "auto"}
+  decoding="async"
+  className="h-full w-full object-cover object-center transition-opacity duration-700"
+/>
+
 
         {/* Dark cinematic overlay */}
 

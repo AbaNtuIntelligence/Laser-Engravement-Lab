@@ -1,7 +1,9 @@
+﻿
 "use client";
 
 import { useState } from "react";
 import ProductModal from "./ProductModal";
+import { addToQuote } from "@/services/quoteBasket";
 
 type Product = {
   id: string;
@@ -12,8 +14,6 @@ type Product = {
   sku: string;
   slug: string;
   unit: string;
-  price: number | null;
-  compare_price: number | null;
   featured: boolean;
   new_arrival: boolean;
   active: boolean;
@@ -27,46 +27,52 @@ type ProductCardProps = {
   product: Product;
 };
 
-function formatPrice(price: number | null) {
-  if (price === null) {
-    return "Price on request";
-  }
-
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(price);
-}
-
 export default function ProductCard({
   product,
 }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [addedToQuote, setAddedToQuote] = useState(false);
 
   const image = product.images?.[0] || null;
 
+  function handleAddToQuote() {
+    addToQuote({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      subcategory: product.subcategory,
+      brand: product.brand,
+      sku: product.sku,
+      slug: product.slug,
+      unit: product.unit,
+      images: product.images,
+      description: product.description,
+    });
+
+    setAddedToQuote(true);
+  }
+
   return (
     <>
-      <article className="group min-w-[220px] max-w-[220px] shrink-0 sm:min-w-[250px] sm:max-w-[250px]">
+      <article className="group flex h-[470px] w-[220px] min-w-[220px] max-w-[220px] shrink-0 flex-col overflow-hidden bg-white sm:w-[250px] sm:min-w-[250px] sm:max-w-[250px]">
+
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
           className="block w-full text-left"
           aria-label={`View details for ${product.name}`}
         >
-          <div className="relative aspect-[4/5] overflow-hidden bg-[var(--store-soft)]">
+          <div className="relative h-[260px] w-full overflow-hidden bg-white sm:h-[300px]">
             {image ? (
               <img
                 src={image}
                 alt={product.name}
-                loading="eager"
-                fetchPriority="high"
+                loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                className="h-full w-full object-contain bg-white p-3 transition-transform duration-500 group-hover:scale-[1.03]"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-[var(--store-soft)] px-6 text-center">
+              <div className="flex h-full w-full items-center justify-center bg-white px-6 text-center">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--store-muted)]">
                   Product image
                 </span>
@@ -85,21 +91,9 @@ export default function ProductCard({
               {product.category}
             </p>
 
-            <h3 className="mt-1 text-sm font-semibold leading-snug text-[var(--store-ink)]">
+            <h3 className="mt-1 line-clamp-2 min-h-[40px] text-sm font-semibold leading-snug text-[var(--store-ink)]">
               {product.name}
             </h3>
-
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-sm font-bold text-[var(--store-ink)]">
-                {formatPrice(product.price)}
-              </span>
-
-              {product.compare_price !== null && (
-                <span className="text-xs text-[var(--store-muted)] line-through">
-                  {formatPrice(product.compare_price)}
-                </span>
-              )}
-            </div>
 
             {product.stock > 0 && (
               <p className="mt-2 text-[10px] font-medium text-[var(--store-muted)]">
@@ -108,6 +102,17 @@ export default function ProductCard({
             )}
           </div>
         </button>
+
+        <div className="mt-auto w-full pt-3">
+          <button
+            type="button"
+            onClick={handleAddToQuote}
+            className="w-full bg-[var(--store-ink)] px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white transition hover:opacity-90"
+          >
+            {addedToQuote ? "Added to quote ✓" : "Add to quote"}
+          </button>
+        </div>
+
       </article>
 
       {isModalOpen && (

@@ -268,8 +268,18 @@ REST_FRAMEWORK = {
 # ============================================================
 
 CORS_ALLOWED_ORIGINS = [
-
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "https://engravinglapgiftstore.co.za",
-
+    "https://www.engravinglapgiftstore.co.za",
 ]
+# Production security settings
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+# Render terminates HTTPS at its reverse proxy.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = not DEBUG
+
+# Keep HSTS disabled until HTTPS and domain configuration are verified.
+SECURE_HSTS_SECONDS = 0

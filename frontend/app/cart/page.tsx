@@ -9,17 +9,7 @@ import {
   type QuoteItem,
 } from "@/services/quoteBasket";
 
-function formatPrice(price: number | null) {
-  if (price === null) {
-    return "Price on request";
-  }
 
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(price);
-}
 
 export default function QuoteBasketPage() {
   const [items, setItems] = useState<QuoteItem[]>([]);
@@ -80,16 +70,7 @@ export default function QuoteBasketPage() {
     0
   );
 
-  const subtotal = items.reduce((total, item) => {
-    if (item.product.price === null) {
-      return total;
-    }
-
-    return (
-      total +
-      item.product.price * item.quantity
-    );
-  }, 0);
+  
 
   if (!loaded) {
     return (
@@ -162,10 +143,7 @@ export default function QuoteBasketPage() {
                 const image =
                   product.images?.[0] || null;
 
-                const lineTotal =
-                  product.price === null
-                    ? null
-                    : product.price * item.quantity;
+                
 
                 return (
                   <article
@@ -265,15 +243,8 @@ export default function QuoteBasketPage() {
                           </div>
 
                           <div className="text-right">
-                            <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[var(--store-muted)]">
-                              Line total
-                            </p>
-
-                            <p className="mt-1 text-sm font-bold text-[var(--store-ink)]">
-                              {lineTotal === null
-                                ? "Price on request"
-                                : formatPrice(lineTotal)}
-                            </p>
+                           
+                            
                           </div>
 
                         </div>
@@ -286,10 +257,7 @@ export default function QuoteBasketPage() {
 
             <aside className="h-fit border border-[var(--store-line)] bg-[var(--store-soft)] p-6 sm:p-7 lg:sticky lg:top-28">
 
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--store-accent)]">
-                Quote summary
-              </p>
-
+              
               <h2 className="mt-2 text-xl font-semibold text-[var(--store-ink)]">
                 Your selection
               </h2>
@@ -307,24 +275,15 @@ export default function QuoteBasketPage() {
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--store-muted)]">
-                  Estimated subtotal
-                </span>
+                
 
-                <span className="text-sm font-bold text-[var(--store-ink)]">
-                  {formatPrice(subtotal)}
-                </span>
+                
               </div>
 
-              <p className="mt-5 text-[10px] leading-5 text-[var(--store-muted)]">
-                This is an estimated product subtotal.
-                Personalisation, engraving, delivery and
-                other applicable costs will be confirmed
-                in your quotation.
-              </p>
+             
 
               <Link
-                href="/checkout"
+                href="/request-quote"
                 className="store-button store-button-dark mt-7 flex w-full"
               >
                 Request quotation

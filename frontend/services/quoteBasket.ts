@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export type QuoteProduct = {
   id: string;
@@ -9,11 +9,12 @@ export type QuoteProduct = {
   sku: string;
   slug: string;
   unit: string;
-  price: number | null;
-  compare_price: number | null;
   images: string[];
   description: string;
 };
+
+
+  
 
 export type QuoteItem = {
   product: QuoteProduct;
@@ -28,7 +29,9 @@ export function getQuoteBasket(): QuoteItem[] {
   }
 
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = window.localStorage.getItem(
+      STORAGE_KEY
+    );
 
     if (!stored) {
       return [];
@@ -136,6 +139,8 @@ export function removeFromQuote(
 
 export function clearQuoteBasket() {
   saveQuoteBasket([]);
+
+  return [];
 }
 
 export function getQuoteItemCount() {
@@ -145,18 +150,5 @@ export function getQuoteItemCount() {
   );
 }
 
-export function getQuoteSubtotal() {
-  return getQuoteBasket().reduce(
-    (total, item) => {
-      if (item.product.price === null) {
-        return total;
-      }
 
-      return (
-        total +
-        item.product.price * item.quantity
-      );
-    },
-    0
-  );
-}
+

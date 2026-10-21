@@ -12,8 +12,6 @@ type Product = {
   sku: string;
   slug: string;
   unit: string;
-  price: number | null;
-  compare_price: number | null;
   featured: boolean;
   new_arrival: boolean;
   active: boolean;
@@ -28,17 +26,7 @@ type ProductModalProps = {
   onClose: () => void;
 };
 
-function formatPrice(price: number | null) {
-  if (price === null) {
-    return "Price on request";
-  }
 
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(price);
-}
 
 export default function ProductModal({
   product,
@@ -102,11 +90,16 @@ export default function ProductModal({
           <div className="relative flex min-h-[320px] flex-1 items-center justify-center p-5 sm:min-h-[620px] sm:p-10">
 
             {activeImage ? (
-              <img
-                src={activeImage}
-                alt={product.name}
-                className="max-h-full max-w-full object-contain"
-              />
+              
+<img
+  src={activeImage}
+  alt={product.name}
+  loading="eager"
+  fetchPriority="auto"
+  decoding="async"
+  className="max-h-full max-w-full object-contain"
+/>
+
             ) : (
               <div className="flex h-full min-h-[280px] w-full items-center justify-center">
                 <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--store-muted)]">
@@ -140,11 +133,15 @@ export default function ProductModal({
                       : "border-transparent"
                   }`}
                 >
-                  <img
-                    src={image}
-                    alt={`${product.name} view ${index + 1}`}
-                    className="h-full w-full object-contain"
-                  />
+                  
+<img
+  src={image}
+  alt={`${product.name} view ${index + 1}`}
+  loading="lazy"
+  decoding="async"
+  className="h-full w-full object-contain"
+/>
+
                 </button>
               ))}
 
@@ -184,25 +181,12 @@ export default function ProductModal({
 
             </div>
 
-            {/* Price */}
+            
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+         
+           {/* Availability */}
 
-              <span className="text-2xl font-bold text-[var(--store-ink)]">
-                {formatPrice(product.price)}
-              </span>
-
-              {product.compare_price !== null && (
-                <span className="text-sm text-[var(--store-muted)] line-through">
-                  {formatPrice(product.compare_price)}
-                </span>
-              )}
-
-            </div>
-
-            {/* Availability */}
-
-            <div className="mt-3">
+            <div className="mt-6">
 
               {product.stock > 0 ? (
                 <p className="text-xs font-medium text-[var(--store-muted)]">
@@ -305,8 +289,6 @@ export default function ProductModal({
       sku: product.sku,
       slug: product.slug,
       unit: product.unit,
-      price: product.price,
-      compare_price: product.compare_price,
       images: product.images,
       description: product.description,
     });
@@ -331,3 +313,4 @@ export default function ProductModal({
     </div>
   );
 }
+

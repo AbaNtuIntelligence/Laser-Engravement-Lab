@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -16,8 +16,6 @@ type Product = {
   sku: string;
   slug: string;
   unit: string;
-  price: number | null;
-  compare_price: number | null;
   featured: boolean;
   new_arrival: boolean;
   active: boolean;
@@ -402,13 +400,13 @@ export default function CataloguePage() {
             </div>
 
             <a
-              href={`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"}/api/catalogue/download/`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-12 shrink-0 items-center justify-center border border-[var(--store-ink)] bg-[var(--store-ink)] px-6 text-[10px] font-bold uppercase tracking-[0.16em] text-white transition hover:bg-black"
-            >
-              Download Catalogue
-            </a>
+  href="/catalogue.pdf"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex h-12 shrink-0 items-center justify-center border border-[var(--store-ink)] bg-[var(--store-ink)] px-6 text-[10px] font-bold uppercase tracking-[0.16em] text-white transition hover:bg-black"
+>
+  Download Catalogue
+</a>
 
           </div>
 
@@ -621,7 +619,7 @@ export default function CataloguePage() {
                   }
                   className="border border-[var(--store-line)] bg-white px-3 py-2 text-xs text-[var(--store-ink)]"
                 >
-                  {selectedCategory} ×
+                  {selectedCategory} Ã—
                 </button>
               )}
 
@@ -633,7 +631,7 @@ export default function CataloguePage() {
                   }
                   className="border border-[var(--store-line)] bg-white px-3 py-2 text-xs text-[var(--store-ink)]"
                 >
-                  New Arrivals ×
+                  New Arrivals Ã—
                 </button>
               )}
 
@@ -645,7 +643,7 @@ export default function CataloguePage() {
                   }
                   className="border border-[var(--store-line)] bg-white px-3 py-2 text-xs text-[var(--store-ink)]"
                 >
-                  {selectedSubcategory} ×
+                  {selectedSubcategory} Ã—
                 </button>
               )}
 
@@ -655,7 +653,7 @@ export default function CataloguePage() {
                   onClick={() => setSearch("")}
                   className="border border-[var(--store-line)] bg-white px-3 py-2 text-xs text-[var(--store-ink)]"
                 >
-                  Search: {search} ×
+                  Search: {search} Ã—
                 </button>
               )}
 

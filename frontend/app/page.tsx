@@ -33,14 +33,6 @@ export default function Home() {
     />
   </div>
 
-  <div id="featured">
-  <ProductCarousel
-    eyebrow="Editor's selection"
-    title="Featured products"
-    featured={true}
-  />
-</div>
-
 <VideoShowcase />
 
 <ProductCarousel

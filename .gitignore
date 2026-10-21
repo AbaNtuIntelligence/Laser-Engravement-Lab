@@ -41,3 +41,12 @@ oauth-client.json
 # OAuth client credentialsoauth-client.json
 
 # Local Google OAuth authorization helperauthorize_google.py
+
+# Sensitive backups
+/oauth-token.json.*
+*.backup
+*.bak
+
+# Abandoned deployment copies
+/frontend-price-removal*/
+/Axxess-deployment*/

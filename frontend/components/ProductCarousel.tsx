@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import ProductCard from "./ProductCard";
@@ -13,8 +13,6 @@ type Product = {
   sku: string;
   slug: string;
   unit: string;
-  price: number | null;
-  compare_price: number | null;
   featured: boolean;
   new_arrival: boolean;
   active: boolean;
@@ -200,7 +198,7 @@ export default function ProductCarousel({
                     disabled:opacity-30
                   "
                 >
-                  ←
+                 {"\u2190"}
                 </button>
 
                 <button
@@ -223,7 +221,7 @@ export default function ProductCarousel({
                     disabled:opacity-30
                   "
                 >
-                  →
+                  {"\u2190"}
                 </button>
 
               </div>

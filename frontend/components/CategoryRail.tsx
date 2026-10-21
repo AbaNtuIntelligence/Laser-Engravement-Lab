@@ -1,31 +1,38 @@
 const categories = [
   {
     name: "Gifts",
-    symbol: "?",
+    symbol: "🎁",
+    slug: "Gifts",
   },
   {
     name: "Jewellery",
-    symbol: "?",
+    symbol: "✦",
+    slug: "Jewellery",
   },
   {
     name: "Home",
-    symbol: "¦",
+    symbol: "⌂",
+    slug: "Home",
   },
   {
     name: "Leather",
-    symbol: "?",
+    symbol: "◈",
+    slug: "Leather",
   },
   {
     name: "Corporate",
-    symbol: "?",
+    symbol: "▣",
+    slug: "Corporate",
   },
   {
     name: "Weddings",
-    symbol: "?",
+    symbol: "♡",
+    slug: "Weddings",
   },
   {
     name: "Custom",
-    symbol: "?",
+    symbol: "✎",
+    slug: "Custom",
   },
 ];
 
@@ -47,13 +54,13 @@ export default function CategoryRail() {
             </p>
 
             <h2 className="text-xl font-semibold tracking-tight">
-              Shop by category
+              Explore by category
             </h2>
 
           </div>
 
           <span className="hidden text-xs text-[var(--store-muted)] sm:block">
-            Swipe to explore ?
+            Swipe to explore
           </span>
 
         </div>
@@ -65,11 +72,14 @@ export default function CategoryRail() {
 
             <a
               key={category.name}
-              href="#"
-              className="group flex min-w-[112px] flex-col items-center gap-3 rounded-2xl border border-[var(--store-line)] bg-[var(--store-paper)] px-5 py-5 transition-all hover:-translate-y-1 hover:border-[var(--store-accent)]"
+              href={`/catalogue/?category=${encodeURIComponent(category.slug)}`}
+              className="group flex min-w-[132px] flex-col items-center gap-3 rounded-2xl border border-[var(--store-line)] bg-[var(--store-paper)] px-5 py-5 transition-all duration-200 hover:-translate-y-1 hover:border-[var(--store-accent)] hover:shadow-sm"
             >
 
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl text-[var(--store-accent)] shadow-sm">
+              <span
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-xl text-[var(--store-accent)] shadow-sm transition-transform duration-200 group-hover:scale-105"
+                aria-hidden="true"
+              >
                 {category.symbol}
               </span>
 

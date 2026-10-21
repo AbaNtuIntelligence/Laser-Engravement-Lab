@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -10,17 +10,7 @@ import {
   type QuoteItem,
 } from "@/services/quoteBasket";
 
-function formatPrice(price: number | null) {
-  if (price === null) {
-    return "Price on request";
-  }
 
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 2,
-  }).format(price);
-}
 
 export default function RequestQuotePage() {
   const [items, setItems] = useState<QuoteItem[]>([]);
@@ -78,16 +68,7 @@ export default function RequestQuotePage() {
     0
   );
 
-  const subtotal = items.reduce((total, item) => {
-    if (item.product.price === null) {
-      return total;
-    }
-
-    return (
-      total +
-      item.product.price * item.quantity
-    );
-  }, 0);
+ 
 async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
 
@@ -125,7 +106,6 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
           id: item.product.id,
           name: item.product.name,
           sku: item.product.sku,
-          price: item.product.price,
         },
         quantity: item.quantity,
       })),
@@ -286,7 +266,7 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
                               aria-label={`Decrease quantity for ${item.product.name}`}
                               className="flex h-full w-9 items-center justify-center text-base text-[var(--store-ink)] transition hover:bg-[var(--store-soft)]"
                             >
-                              −
+                              âˆ’
                             </button>
 
                             <span className="flex h-full min-w-10 items-center justify-center border-x border-[var(--store-line)] px-2 text-xs font-bold text-[var(--store-ink)]">
@@ -323,43 +303,10 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 
                       </div>
 
-                      {/* PRICE */}
-
-                      <div className="hidden shrink-0 text-right sm:block">
-                        <p className="text-sm font-bold text-[var(--store-ink)]">
-                          {item.product.price === null
-                            ? "Quote"
-                            : formatPrice(
-                                item.product.price *
-                                  item.quantity
-                              )}
-                        </p>
-
-                        {item.product.price !== null && (
-                          <p className="mt-1 text-[9px] text-[var(--store-muted)]">
-                            {formatPrice(item.product.price)} each
-                          </p>
-                        )}
-                      </div>
+                    
 
                     </div>
 
-                    {/* MOBILE PRICE */}
-
-                    <div className="mt-4 flex items-center justify-between border-t border-[var(--store-line)] pt-4 sm:hidden">
-                      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[var(--store-muted)]">
-                        Estimated
-                      </span>
-
-                      <span className="text-sm font-bold text-[var(--store-ink)]">
-                        {item.product.price === null
-                          ? "Price on request"
-                          : formatPrice(
-                              item.product.price *
-                                item.quantity
-                            )}
-                      </span>
-                    </div>
 
                   </div>
                 ))}
@@ -559,14 +506,7 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
                     </p>
                   </div>
 
-                  <p className="shrink-0 text-xs font-bold text-[var(--store-ink)]">
-                    {item.product.price === null
-                      ? "Quote"
-                      : formatPrice(
-                          item.product.price *
-                            item.quantity
-                        )}
-                  </p>
+                
                 </div>
               ))}
 
@@ -574,15 +514,7 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 
             <div className="my-6 h-px bg-[var(--store-line)]" />
 
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-[var(--store-muted)]">
-                Estimated subtotal
-              </span>
-
-              <span className="text-base font-bold text-[var(--store-ink)]">
-                {formatPrice(subtotal)}
-              </span>
-            </div>
+            
 
             <p className="mt-4 text-[10px] leading-5 text-[var(--store-muted)]">
               Final pricing may vary depending on engraving
