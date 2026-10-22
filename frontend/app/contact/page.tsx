@@ -456,6 +456,14 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 />
                     </div>
 
+
+{submitError && (
+  <p role="alert" className="text-sm text-red-600">
+    {submitError}
+  </p>
+)}
+
+
                     {/* Submit */}
 
                     <button
