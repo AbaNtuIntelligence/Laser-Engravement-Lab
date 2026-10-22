@@ -25,10 +25,12 @@ type Product = {
 
 type ProductCardProps = {
   product: Product;
+  priority?: boolean;
 };
 
 export default function ProductCard({
   product,
+  priority = false,
 }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addedToQuote, setAddedToQuote] = useState(false);
@@ -64,13 +66,16 @@ export default function ProductCard({
         >
           <div className="relative h-[260px] w-full overflow-hidden bg-white sm:h-[300px]">
             {image ? (
-              <img
-                src={image}
-                alt={product.name}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-contain bg-white p-3 transition-transform duration-500 group-hover:scale-[1.03]"
-              />
+            <img
+  src={image}
+  alt={product.name}
+  loading={priority ? "eager" : "lazy"}
+  fetchPriority={priority ? "high" : "auto"}
+  decoding="async"
+  width={500}
+  height={600}
+  className="h-full w-full object-contain bg-white p-3 transition-transform duration-500 group-hover:scale-[1.03]"
+/>
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-white px-6 text-center">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--store-muted)]">

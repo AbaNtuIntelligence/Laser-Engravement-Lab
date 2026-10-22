@@ -43,12 +43,15 @@ export default function HeroSlider() {
   const slide = slides[active];
 
 useEffect(() => {
-  const nextIndex = (active + 1) % slides.length;
-  const nextImage = new window.Image();
+  const timer = window.setTimeout(() => {
+    const nextIndex = (active + 1) % slides.length;
+    const nextImage = new window.Image();
 
-  nextImage.src = slides[nextIndex].image;
+    nextImage.src = slides[nextIndex].image;
+  }, 2500);
+
+  return () => window.clearTimeout(timer);
 }, [active]);
-
 
   return (
     <section className="relative min-h-[500px] overflow-hidden bg-[var(--store-dark)] md:min-h-[58vh]">

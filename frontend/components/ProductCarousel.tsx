@@ -366,11 +366,14 @@ export default function ProductCarousel({
             "
             style={{ maskImage, WebkitMaskImage: maskImage }}
           >
-            {products.map((product) => (
-              <div key={product.id} className="snap-start">
-                <ProductCard product={product} />
-              </div>
-            ))}
+            {products.map((product, index) => (
+  <div key={product.id} className="snap-start">
+    <ProductCard
+      product={product}
+      priority={index < 3}
+    />
+  </div>
+))}
           </div>
         )}
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -121,16 +121,6 @@ export default function ProductModal({
     setSelectedImage((i) => (i + 1) % images.length);
   }, [images.length]);
 
-  // Preload neighbours
-  useEffect(() => {
-    if (!hasMultiple) return;
-    [selectedImage - 1, selectedImage + 1].forEach((idx) => {
-      const src = images[idx];
-      if (!src) return;
-      const img = new window.Image();
-      img.src = src;
-    });
-  }, [selectedImage, images, hasMultiple]);
 
   // Keep active thumb in view
   useEffect(() => {
