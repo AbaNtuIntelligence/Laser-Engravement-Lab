@@ -4,6 +4,7 @@
 import { useState } from "react";
 import ProductModal from "./ProductModal";
 import { addToQuote } from "@/services/quoteBasket";
+import thumbnailLookup from "./thumbnail-lookup.json";
 
 type Product = {
   id: string;
@@ -54,6 +55,23 @@ export default function ProductCard({
     setAddedToQuote(true);
   }
 
+const thumbnailPaths = thumbnailLookup as Record<string, string>;
+
+const thumbnail = (() => {
+  if (!image) return null;
+
+  const originalPath = image.split("?")[0];
+
+  if (!originalPath.startsWith("/images/products/")) {
+    return image;
+  }
+
+  const relativePath = originalPath
+    .replace("/images/products/", "")
+    .replace(/\.(png|jpe?g|webp)$/i, ".webp");
+
+  return thumbnailPaths[relativePath] || image;
+})();
   return (
     <>
       <article className="group flex h-[470px] w-[220px] min-w-[220px] max-w-[220px] shrink-0 flex-col overflow-hidden bg-white sm:w-[250px] sm:min-w-[250px] sm:max-w-[250px]">
@@ -67,7 +85,7 @@ export default function ProductCard({
           <div className="relative h-[260px] w-full overflow-hidden bg-white sm:h-[300px]">
             {image ? (
             <img
-  src={image}
+  src={thumbnail ?? undefined}
   alt={product.name}
   loading={priority ? "eager" : "lazy"}
   fetchPriority={priority ? "high" : "auto"}
@@ -76,6 +94,7 @@ export default function ProductCard({
   height={600}
   className="h-full w-full object-contain bg-white p-3 transition-transform duration-500 group-hover:scale-[1.03]"
 />
+
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-white px-6 text-center">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--store-muted)]">
