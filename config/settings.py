@@ -154,6 +154,7 @@ CONTACT_EMAIL = os.getenv(
     "CONTACT_EMAIL",
     EMAIL_HOST_USER,
 )
+QUOTE_CC_EMAIL = os.getenv("QUOTE_CC_EMAIL", "")
 
 
 
