@@ -1,118 +1,150 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 
 const slides = [
   {
+    eyebrow: "CORPORATE ENGRAVING",
+    title: "Make an impression.",
+    text: "Premium engraved plaques and meaningful corporate keepsakes.",
+    image: "/images/products/corporate/custom-engraved-artistic-portrait-wood-plaque.webp",
+    position: "center",
+  },
+  {
+    eyebrow: "CUSTOM CREATIONS",
+    title: "Your vision. Our craft.",
+    text: "Turn special memories into one-of-a-kind personalised creations.",
+    image: "/images/products/custom/custom-color-photo-jigsaw-puzzle.webp",
+    position: "center",
+  },
+  {
     eyebrow: "PERSONALISED GIFTS",
-    title: "Made personal.",
-    text: "Premium engraved pieces created for the people and moments that matter.",
-    image:
-      "/images/products/wine-boxes/wooden-wine-bottle-gift-box-floral-wine-glass-design.webp",
+    title: "Gifts worth keeping.",
+    text: "Thoughtful engraved gifts made for unforgettable moments.",
+    image: "/images/products/gifts/blue-octagonal-wooden-box-gold-chain.webp",
+    position: "center",
   },
-
   {
-    eyebrow: "CUSTOM CRAFT",
-    title: "Your idea. Our craft.",
-    text: "Turn your concept into something tangible, personal and built to last.",
-    image:
-      "/images/products/corporate/custom-engraved-artistic-portrait-wood-plaque.webp",
+    eyebrow: "HOME & LIFESTYLE",
+    title: "Personal touches.",
+    text: "Beautifully crafted engraved pieces for the spaces you love.",
+    image: "/images/products/home/custom-monogram-message-wooden-tray-collection.webp",
+    position: "center",
   },
-
   {
-    eyebrow: "CORPORATE & EVENTS",
-    title: "Make it memorable.",
-    text: "Thoughtful engraved gifts for teams, clients, celebrations and milestones.",
-    image:
-      "/images/products/home/custom-monogram-message-wooden-tray-collection.webp",
+    eyebrow: "JEWELLERY",
+    title: "Wear your story.",
+    text: "Distinctive laser-cut jewellery with character and detail.",
+    image: "/images/products/jewellery/geometric-blue-diamond-earrings.webp",
+    position: "center",
   },
-  
+  {
+    eyebrow: "LEATHER ACCESSORIES",
+    title: "Crafted for you.",
+    text: "Personalised leather accessories with a timeless finish.",
+    image: "/images/products/leather/mazibuko-monogram-black-leather-wallet.webp",
+    position: "center",
+  },
+  {
+    eyebrow: "PERSONALISED MERCHANDISE",
+    title: "Make it yours.",
+    text: "Customised everyday essentials with a personal touch.",
+    image: "/images/products/personalised-gifts/kelvin-power-custom-name-mug.webp",
+    position: "center",
+  },
+  {
+    eyebrow: "WINE GIFT BOXES",
+    title: "Celebrate beautifully.",
+    text: "Elegant wooden wine presentation boxes for special occasions.",
+    image: "/images/products/wine-boxes/custom-engraved-portrait-wine-box-floral-cutout.webp",
+    position: "center",
+  },
 ];
 
 export default function HeroSlider() {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (paused) return;
+
+    const timer = window.setInterval(() => {
       setActive((current) => (current + 1) % slides.length);
-    }, 6000);
+    }, 7000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => window.clearInterval(timer);
+  }, [paused]);
 
-  const slide = slides[active];
+  useEffect(() => {
+    const next = (active + 1) % slides.length;
+    const image = new window.Image();
+    image.src = slides[next].image;
+  }, [active]);
 
-useEffect(() => {
-  const timer = window.setTimeout(() => {
-    const nextIndex = (active + 1) % slides.length;
-    const nextImage = new window.Image();
+  const previousSlide = () => {
+    setActive((current) => (current - 1 + slides.length) % slides.length);
+  };
 
-    nextImage.src = slides[nextIndex].image;
-  }, 2500);
-
-  return () => window.clearTimeout(timer);
-}, [active]);
+  const nextSlide = () => {
+    setActive((current) => (current + 1) % slides.length);
+  };
 
   return (
-    <section className="relative min-h-[500px] overflow-hidden bg-[var(--store-dark)] md:min-h-[58vh]">
-
-      {/* HERO IMAGE */}
-
+    <section
+      aria-label="Laser Engraving Lab product showcase"
+      aria-roledescription="carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setPaused(false);
+        }
+      }}
+      className="relative isolate h-[75svh] min-h-[520px] overflow-hidden bg-[#171717] md:h-[88svh] md:min-h-[620px] md:max-h-[1050px]"
+    >
+      {/* Category photography */}
       <div className="absolute inset-0">
+        {slides.map((slide, index) => (
+          <img
+            key={slide.image}
+            src={slide.image}
+            alt=""
+            aria-hidden="true"
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
+            decoding="async"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+              active === index ? "opacity-100" : "opacity-0"
+            }`}
+            style={{ objectPosition: slide.position }}
+          />
+        ))}
 
-       
-<img
-  src={slide.image}
-  alt=""
-  loading="eager"
-  fetchPriority={active === 0 ? "high" : "auto"}
-  decoding="async"
-  className="h-full w-full object-cover object-center transition-opacity duration-700"
-/>
+        {/* Light directional overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/25 to-transparent" />
 
-
-        {/* Dark cinematic overlay */}
-
-        <div className="absolute inset-0 bg-black/55" />
-
-        {/* Left-side readability gradient */}
-
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-
-        {/* Bottom fade */}
-
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent" />
-
-        {/* Subtle warm accent */}
-
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(161,122,63,0.20),transparent_35%)]" />
-
+        {/* Subtle lower fade */}
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/45 to-transparent" />
       </div>
 
-
-      {/* Content */}
-
-      <div className="store-container relative flex min-h-[500px] items-end py-14 md:min-h-[58vh] md:items-center md:py-20">
-
-        <div className="max-w-2xl text-white">
-
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.25em] text-[var(--store-accent)]">
-            {slide.eyebrow}
+      {/* Main content */}
+      <div className="store-container relative z-10 flex h-full items-center">
+        <div className="max-w-[680px] py-20 text-white">
+          <p className="mb-5 text-xs font-bold uppercase tracking-[0.25em] text-[var(--store-accent)]">
+            {slides[active].eyebrow}
           </p>
 
-          <h1 className="max-w-xl text-5xl font-semibold leading-[0.95] tracking-[-0.055em] md:text-7xl lg:text-8xl">
-            {slide.title}
+          <h1 className="max-w-2xl text-5xl font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-7xl xl:text-8xl">
+            {slides[active].title}
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-7 text-white/75 md:text-lg">
-            {slide.text}
+          <p className="mt-6 max-w-lg text-base leading-7 text-white/90 md:text-lg">
+            {slides[active].text}
           </p>
 
-
-          {/* CTA BUTTONS */}
-
-          <div className="mt-8 flex flex-wrap gap-3">
-
+          <div className="mt-9 flex flex-wrap gap-3">
             <a
               href="#featured"
               className="store-button bg-white text-[var(--store-ink)]"
@@ -126,41 +158,53 @@ useEffect(() => {
             >
               Custom Order
             </a>
-
           </div>
-
         </div>
-
       </div>
 
-
-      {/* Slider controls */}
-
-      <div className="store-container absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center justify-between">
-
-        <div className="flex gap-2">
-
-          {slides.map((_, index) => (
-
+      {/* Slider navigation */}
+      <div className="store-container absolute inset-x-0 bottom-7 z-20 flex items-center justify-between gap-4 md:bottom-10">
+        <div className="flex flex-wrap items-center gap-2">
+          {slides.map((slide, index) => (
             <button
-              key={index}
+              key={slide.image}
               type="button"
               onClick={() => setActive(index)}
-              aria-label={`Show slide ${index + 1}`}
-              className={`h-1 transition-all ${
-                active === index
-                  ? "w-10 bg-white"
-                  : "w-5 bg-white/30"
-              }`}
-            />
-
+              aria-label={`Show ${slide.eyebrow} slide`}
+              aria-current={active === index ? "true" : undefined}
+              className="flex min-h-11 items-center justify-center px-1"
+            >
+              <span
+                className={`block h-1 rounded-full transition-all duration-300 ${
+                  active === index
+                    ? "w-8 bg-white"
+                    : "w-4 bg-white/40 hover:bg-white/80"
+                }`}
+              />
+            </button>
           ))}
-
         </div>
 
-      </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={previousSlide}
+            aria-label="Previous slide"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white transition hover:bg-white hover:text-black"
+          >
+            <span aria-hidden="true" className="text-xl">‹</span>
+          </button>
 
+          <button
+            type="button"
+            onClick={nextSlide}
+            aria-label="Next slide"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white transition hover:bg-white hover:text-black"
+          >
+            <span aria-hidden="true" className="text-xl">›</span>
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
-
