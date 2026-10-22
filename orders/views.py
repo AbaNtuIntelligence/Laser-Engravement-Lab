@@ -1,4 +1,4 @@
-
+﻿
 from decimal import Decimal
 import logging
 
@@ -231,4 +231,84 @@ class QuoteCreateView(APIView):
                 },
             },
             status=status.HTTP_201_CREATED,
+        )
+
+class ContactCreateView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+
+        name = str(request.data.get("name", "")).strip()
+        email = str(request.data.get("email", "")).strip()
+        phone = str(request.data.get("phone", "")).strip()
+        subject = str(request.data.get("subject", "")).strip()
+        message = str(request.data.get("message", "")).strip()
+
+        if not name or not email or not message:
+            return Response(
+                {"success": False, "message": "Name, email and message are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response(
+                {"success": False, "message": "Enter a valid email address."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not settings.RESEND_API_KEY:
+            logger.error("Contact submission failed: Resend API key missing.")
+            return Response(
+                {"success": False, "message": "Email service unavailable. Please try again later."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        email_body = "\n".join([
+            "NEW CONTACT ENQUIRY - LASER ENGRAVING LAB",
+            "",
+            f"Name: {name}",
+            f"Email: {email}",
+            f"Phone: {phone or 'Not provided'}",
+            f"Subject: {subject or 'General enquiry'}",
+            "",
+            "MESSAGE:",
+            message,
+        ])
+
+        payload = {
+            "from": settings.RESEND_FROM_EMAIL,
+            "to": [settings.CONTACT_EMAIL],
+            "cc": [settings.QUOTE_CC_EMAIL] if settings.QUOTE_CC_EMAIL else [],
+            "reply_to": email,
+            "subject": f"Contact Enquiry - {subject or 'General Enquiry'}",
+            "text": email_body,
+        }
+
+        try:
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=12,
+            )
+            response.raise_for_status()
+
+        except requests.exceptions.RequestException:
+            logger.exception("Contact enquiry email submission failed.")
+            return Response(
+                {"success": False, "message": "We could not send your enquiry. Please try again."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        return Response(
+            {"success": True, "message": "Your enquiry has been sent successfully."},
+            status=status.HTTP_200_OK,
         )

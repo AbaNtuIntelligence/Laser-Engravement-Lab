@@ -6,11 +6,59 @@ import Footer from "@/components/Footer";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+const [submitting, setSubmitting] = useState(false);
+const [submitError, setSubmitError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  if (submitting) return;
+
+  setSubmitting(true);
+  setSubmitError("");
+
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+
+  const payload = {
+    name: String(formData.get("name") || "").trim(),
+    email: String(formData.get("email") || "").trim(),
+    phone: String(formData.get("phone") || "").trim(),
+    subject: String(formData.get("project") || "").trim(),
+    message: String(formData.get("message") || "").trim(),
+  };
+
+  try {
+    const response = await fetch(
+      "https://laser-original-api.onrender.com/api/orders/contact/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(
+        result.message || "Unable to send your enquiry."
+      );
+    }
+
     setSubmitted(true);
+  } catch (error) {
+    setSubmitError(
+      error instanceof Error
+        ? error.message
+        : "Unable to send your enquiry. Please try again."
+    );
+  } finally {
+    setSubmitting(false);
   }
+}
 
   return (
     <>
@@ -390,28 +438,29 @@ export default function ContactPage() {
                       </label>
 
                       <textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows={6}
-                        placeholder="Tell us what you have in mind..."
-                        className="
-                          w-full resize-y
-                          border border-[var(--store-line)]
-                          bg-white px-4 py-3
-                          text-sm leading-6
-                          outline-none
-                          transition-colors
-                          placeholder:text-black/30
-                          focus:border-[var(--store-ink)]
-                        "
-                      />
+  id="message"
+  name="message"
+  required
+  rows={6}
+  placeholder="Tell us what you have in mind..."
+  className="
+    w-full resize-y
+    border border-[var(--store-line)]
+    bg-white px-4 py-3
+    text-sm leading-6
+    outline-none
+    transition-colors
+    placeholder:text-black/30
+    focus:border-[var(--store-ink)]
+  "
+/>
                     </div>
 
                     {/* Submit */}
 
                     <button
-                      type="submit"
+  type="submit"
+  disabled={submitting}
                       className="
                         flex min-h-12 w-full
                         items-center justify-center
@@ -423,7 +472,7 @@ export default function ContactPage() {
                         hover:bg-black
                       "
                     >
-                      Send Enquiry
+                     {submitting ? "Sending Enquiry..." : "Send Enquiry"}
                     </button>
 
                   </form>
