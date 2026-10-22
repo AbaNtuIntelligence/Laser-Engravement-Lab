@@ -284,3 +284,10 @@ SECURE_SSL_REDIRECT = not DEBUG
 
 # Keep HSTS disabled until HTTPS and domain configuration are verified.
 SECURE_HSTS_SECONDS = 0
+
+# Resend HTTPS email API
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+RESEND_FROM_EMAIL = os.getenv(
+    "RESEND_FROM_EMAIL",
+    "Laser Engraving Lab <sales@engravinglapgiftstore.co.za>",
+)

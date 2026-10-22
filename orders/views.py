@@ -3,7 +3,7 @@ from decimal import Decimal
 import logging
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+import requests
 from django.db import transaction
 
 from rest_framework import status
@@ -168,36 +168,51 @@ class QuoteCreateView(APIView):
             ])
 
             try:
-                notification = EmailMessage(
-                    subject=f"New Quote Request - {quote.reference}",
-                    body=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[recipient],
-                    cc=[cc_recipient] if cc_recipient else [],
-                    reply_to=[quote.email],
+                if not settings.RESEND_API_KEY:
+                    raise RuntimeError(
+                        "RESEND_API_KEY is not configured."
+                    )
+
+                payload = {
+                    "from": settings.RESEND_FROM_EMAIL,
+                    "to": [recipient],
+                    "cc": [cc_recipient] if cc_recipient else [],
+                    "reply_to": quote.email,
+                    "subject": f"New Quote Request - {quote.reference}",
+                    "text": message,
+                }
+
+                response = requests.post(
+                    "https://api.resend.com/emails",
+                    headers={
+                        "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                    timeout=12,
                 )
 
-                sent_count = notification.send(
-                    fail_silently=False
+                response.raise_for_status()
+
+                email_id = response.json().get("id")
+
+                logger.info(
+                    "Quote %s notification accepted by Resend. Email ID: %s",
+                    quote.reference,
+                    email_id,
                 )
 
-                if sent_count == 1:
-                    logger.info(
-                        "Quote %s notification accepted by SMTP.",
-                        quote.reference,
-                    )
-                else:
-                    logger.error(
-                        "Quote %s notification was not sent.",
-                        quote.reference,
-                    )
+            except requests.exceptions.RequestException:
+                logger.exception(
+                    "Quote %s saved but Resend API request failed.",
+                    quote.reference,
+                )
 
             except Exception:
                 logger.exception(
                     "Quote %s saved but email notification failed.",
                     quote.reference,
                 )
-
         # ---------------------------------------------------------
         # Return quotation confirmation
         # ---------------------------------------------------------
