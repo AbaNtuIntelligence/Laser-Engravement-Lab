@@ -143,34 +143,11 @@ export default function ProductCarousel({
   /* --------------------------------------------------------------- */
   /* Navigation                                                      */
   /* --------------------------------------------------------------- */
+  const [isPaused, setIsPaused] = useState(false);
+
   const scrollRail = useCallback((direction: "left" | "right") => {
     const rail = railRef.current;
-    const [isPaused, setIsPaused] = useState(false);
     if (!rail) return;
-
-useEffect(() => {
-  if (!featured || isPaused || loading || error || products.length < 7) {
-    return;
-  }
-
-  const timer = window.setInterval(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-
-    const maxScroll = rail.scrollWidth - rail.clientWidth;
-
-    if (maxScroll <= 0) return;
-
-    if (rail.scrollLeft >= maxScroll - 4) {
-      rail.scrollTo({ left: 0, behavior: "smooth" });
-    } else {
-      scrollRail("right");
-    }
-  }, 6500);
-
-  return () => window.clearInterval(timer);
-}, [featured, isPaused, loading, error, products.length, scrollRail]); 
-
 
     const amount = Math.max(rail.clientWidth * 0.85, 300);
 
@@ -179,6 +156,39 @@ useEffect(() => {
       behavior: "smooth",
     });
   }, []);
+
+  // Automatically advance Featured Products.
+  useEffect(() => {
+    if (!featured || isPaused || loading || error || products.length < 2) {
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      const rail = railRef.current;
+      if (!rail) return;
+
+      const maxScroll = rail.scrollWidth - rail.clientWidth;
+      if (maxScroll <= 1) return;
+
+      if (rail.scrollLeft >= maxScroll - 4) {
+        rail.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        const firstCard = rail.firstElementChild;
+        const gap = parseFloat(getComputedStyle(rail).columnGap) || 0;
+        const step = firstCard
+          ? firstCard.getBoundingClientRect().width + gap
+          : rail.clientWidth;
+
+        rail.scrollBy({ left: step, behavior: "smooth" });
+      }
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, [featured, isPaused, loading, error, products.length]);
 
   /* --------------------------------------------------------------- */
   /* Edge mask                                                       */
@@ -204,7 +214,6 @@ useEffect(() => {
   const thumbWidthPct = Math.max(visibleRatio * 100, 8);
   const thumbLeftPct = progress * (100 - thumbWidthPct);
 
-  const [isPaused, setIsPaused] = useState(false);
   /* --------------------------------------------------------------- */
   /* Render                                                          */
   /* --------------------------------------------------------------- */
