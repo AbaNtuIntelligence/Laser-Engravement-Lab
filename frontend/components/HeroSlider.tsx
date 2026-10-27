@@ -102,7 +102,7 @@ export default function HeroSlider() {
           setPaused(false);
         }
       }}
-      className="relative isolate h-[75svh] min-h-[520px] overflow-hidden bg-[#171717] md:h-[88svh] md:min-h-[620px] md:max-h-[1050px]"
+      className="relative isolate h-[320px] overflow-hidden rounded-2xl bg-[#171717] sm:h-[360px] lg:h-[400px]"
     >
       {/* Category photography */}
       <div className="absolute inset-0">
@@ -130,8 +130,8 @@ export default function HeroSlider() {
       </div>
 
       {/* Main content */}
-      <div className="store-container relative z-10 flex h-full items-center">
-        <div className="max-w-[680px] py-20 text-white">
+      <div className="store-container absolute inset-x-0 bottom-2 z-20 flex items-center justify-between gap-4 md:bottom-4">
+        <div className="max-w-[520px] pb-14 pt-4 text-white md:pb-12 md:pt-6">
           <p className="mb-5 text-xs font-bold uppercase tracking-[0.25em] text-[var(--store-accent)]">
             {slides[active].eyebrow}
           </p>
@@ -140,7 +140,7 @@ export default function HeroSlider() {
             {slides[active].title}
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-7 text-white/90 md:text-lg">
+          <p className="mt-3 max-w-md text-sm leading-6 text-white/90 md:text-base">
             {slides[active].text}
           </p>
 
