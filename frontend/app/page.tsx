@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import HeroSlider from "@/components/HeroSlider";
+﻿import Header from "@/components/Header";
+import StorefrontHero from "@/components/StorefrontHero";
 import CategoryRail from "@/components/CategoryRail";
 import ProductCarousel from "@/components/ProductCarousel";
 import VideoShowcase from "@/components/VideoShowcase";
@@ -19,9 +19,9 @@ export default function Home() {
 
       <Header />
 
-      <main>
+<main className="pt-[68px] md:pt-[104px]">
 
-  <HeroSlider />
+ <StorefrontHero />
 
   <CategoryRail />
 
@@ -33,7 +33,6 @@ export default function Home() {
     />
   </div>
 
-<VideoShowcase />
 
 <ProductCarousel
   eyebrow="Personalised gifting"
@@ -63,6 +62,7 @@ export default function Home() {
 
   <HowItWorks />
 
+  <VideoShowcase />
   <CraftSection />
 
   <TrustBar />
@@ -75,3 +75,4 @@ export default function Home() {
 
   );
 }
+

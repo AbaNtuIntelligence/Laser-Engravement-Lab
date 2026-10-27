@@ -145,7 +145,32 @@ export default function ProductCarousel({
   /* --------------------------------------------------------------- */
   const scrollRail = useCallback((direction: "left" | "right") => {
     const rail = railRef.current;
+    const [isPaused, setIsPaused] = useState(false);
     if (!rail) return;
+
+useEffect(() => {
+  if (!featured || isPaused || loading || error || products.length < 7) {
+    return;
+  }
+
+  const timer = window.setInterval(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const maxScroll = rail.scrollWidth - rail.clientWidth;
+
+    if (maxScroll <= 0) return;
+
+    if (rail.scrollLeft >= maxScroll - 4) {
+      rail.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      scrollRail("right");
+    }
+  }, 6500);
+
+  return () => window.clearInterval(timer);
+}, [featured, isPaused, loading, error, products.length, scrollRail]); 
+
 
     const amount = Math.max(rail.clientWidth * 0.85, 300);
 
@@ -179,6 +204,7 @@ export default function ProductCarousel({
   const thumbWidthPct = Math.max(visibleRatio * 100, 8);
   const thumbLeftPct = progress * (100 - thumbWidthPct);
 
+  const [isPaused, setIsPaused] = useState(false);
   /* --------------------------------------------------------------- */
   /* Render                                                          */
   /* --------------------------------------------------------------- */
@@ -343,38 +369,51 @@ export default function ProductCarousel({
 
         {/* RAIL */}
         {hasProducts && (
-          <div
-            ref={railRef}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowRight") {
-                e.preventDefault();
-                scrollRail("right");
-              } else if (e.key === "ArrowLeft") {
-                e.preventDefault();
-                scrollRail("left");
-              }
-            }}
-            role="group"
-            aria-label={`${title} products`}
-            className="
-              store-horizontal-rail scroll-smooth snap-x snap-mandatory
-              overscroll-x-contain
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-              outline-none focus-visible:outline focus-visible:outline-1
-              focus-visible:outline-offset-4 focus-visible:outline-[var(--store-ink)]
-            "
-            style={{ maskImage, WebkitMaskImage: maskImage }}
-          >
-            {products.map((product, index) => (
-  <div key={product.id} className="snap-start">
-    <ProductCard
-      product={product}
-      priority={index < 3}
-    />
-  </div>
-))}
-          </div>
+      <div
+      
+  ref={railRef}
+  tabIndex={0}
+  onMouseEnter={() => setIsPaused(true)}
+  onMouseLeave={() => setIsPaused(false)}
+  onFocusCapture={() => setIsPaused(true)}
+  onBlurCapture={(event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setIsPaused(false);
+    }
+  }}
+  className="
+    store-horizontal-rail
+    scroll-smooth
+    snap-x
+    snap-mandatory
+    overscroll-x-contain
+    outline-none
+    focus-visible:outline
+    focus-visible:outline-1
+    focus-visible:outline-offset-4
+    focus-visible:outline-[var(--store-ink)]
+  "
+  style={{ maskImage, WebkitMaskImage: maskImage }}
+>
+  {products.map((product, index) => (
+    <div
+      key={product.id}
+      className="
+        min-w-0 shrink-0 snap-start
+        basis-[75%]
+        sm:basis-[calc((100%-12px)/2)]
+        md:basis-[calc((100%-24px)/3)]
+        lg:basis-[calc((100%-36px)/4)]
+        xl:basis-[calc((100%-60px)/6)]
+      "
+    >
+      <ProductCard
+        product={product}
+        priority={index < 6}
+      />
+    </div>
+  ))}
+</div>
         )}
 
         {/* PROGRESS + COUNT */}

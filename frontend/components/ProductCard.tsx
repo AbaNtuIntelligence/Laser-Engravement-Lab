@@ -74,7 +74,16 @@ const thumbnail = (() => {
 })();
   return (
     <>
-      <article className="group flex h-[470px] w-[220px] min-w-[220px] max-w-[220px] shrink-0 flex-col overflow-hidden bg-white sm:w-[250px] sm:min-w-[250px] sm:max-w-[250px]">
+      <article
+  className="
+    group flex h-[390px] w-full min-w-0
+    flex-col overflow-hidden rounded-lg
+    border border-[var(--store-line)]
+    bg-white shadow-sm
+    transition-shadow duration-300
+    hover:shadow-md
+  "
+>
 
         <button
           type="button"
@@ -82,7 +91,7 @@ const thumbnail = (() => {
           className="block w-full text-left"
           aria-label={`View details for ${product.name}`}
         >
-          <div className="relative h-[260px] w-full overflow-hidden bg-white sm:h-[300px]">
+          <div className="relative h-[205px] w-full overflow-hidden bg-white">
             {image ? (
             <img
   src={thumbnail ?? undefined}
@@ -110,7 +119,7 @@ const thumbnail = (() => {
             )}
           </div>
 
-          <div className="pt-4">
+        <div className="px-3 pt-3">
             <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--store-accent)]">
               {product.category}
             </p>
@@ -127,7 +136,7 @@ const thumbnail = (() => {
           </div>
         </button>
 
-        <div className="mt-auto w-full pt-3">
+       <div className="mt-auto w-full px-3 pb-3 pt-3">
           <button
             type="button"
             onClick={handleAddToQuote}
