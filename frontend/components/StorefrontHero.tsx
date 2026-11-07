@@ -1,20 +1,19 @@
-
 import HeroSlider from "./HeroSlider";
 
 const promotions = [
   {
-    title: "Personalised Gifts",
-    subtitle: "Made meaningful, made for you",
-    image:
-      "/images/products/gifts/blue-octagonal-wooden-box-gold-chain.webp",
-    href: "/catalogue/?category=Gifts",
+    title: "Custom Keepsakes",
+    subtitle: "Turn your memories into art",
+    // Using the new Best Dad Plaque image
+    image: "/images/products/corporate/best-dad-engraved-photo-plaque.webp",
+    href: "/catalogue/?category=Corporate",
   },
   {
-    title: "Corporate Engraving",
-    subtitle: "Distinctive gifts for your business",
-    image:
-      "/images/products/corporate/custom-engraved-artistic-portrait-wood-plaque.webp",
-    href: "/catalogue/?category=Corporate",
+    title: "Personalised Gifting",
+    subtitle: "Made meaningful, made for you",
+    // Using the new Custom Photo Tumbler image
+    image: "/images/products/gifts/custom-photo-tumbler.webp",
+    href: "/catalogue/?category=Gifts",
   },
 ];
 
@@ -22,25 +21,27 @@ export default function StorefrontHero() {
   return (
     <section
       aria-label="Featured collections and promotions"
-      className="bg-white py-4 md:py-6"
+      className="bg-white py-3 md:py-4"
     >
       <div className="store-container">
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-          <div className="min-w-0 lg:col-span-2">
+        <div className="grid grid-cols-1 gap-3 lg:h-[320px] lg:grid-cols-3">
+          {/* Hero — constrained to a typical banner height */}
+          <div className="h-[200px] min-w-0 overflow-hidden rounded-2xl sm:h-[260px] lg:col-span-2 lg:h-full">
             <HeroSlider />
           </div>
 
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+          {/* Promo pair — matches hero height on desktop */}
+          <div className="grid h-[150px] grid-cols-2 gap-3 sm:h-[180px] lg:h-full lg:grid-cols-1">
             {promotions.map((promotion) => (
               <a
                 key={promotion.title}
                 href={promotion.href}
-                className="group relative min-h-[150px] overflow-hidden rounded-2xl bg-neutral-900 lg:min-h-0"
+                className="group relative min-h-0 overflow-hidden rounded-2xl bg-neutral-900"
               >
                 <img
                   src={promotion.image}
                   alt=""
-                  loading="lazy"
+                  loading="eager"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 

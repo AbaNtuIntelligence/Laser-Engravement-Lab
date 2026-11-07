@@ -119,21 +119,21 @@ const thumbnail = (() => {
             )}
           </div>
 
-        <div className="px-3 pt-3">
-            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--store-accent)]">
-              {product.category}
-            </p>
+       <div className="px-3 pt-3">
+  <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--store-accent)]">
+    {product.category}
+  </p>
 
-            <h3 className="mt-1 line-clamp-2 min-h-[40px] text-sm font-semibold leading-snug text-[var(--store-ink)]">
-              {product.name}
-            </h3>
+  <h3 className="mt-1 line-clamp-2 min-h-[40px] text-sm font-semibold leading-snug text-[var(--store-ink)]">
+    {product.name}
+  </h3>
 
-            {product.stock > 0 && (
-              <p className="mt-2 text-[10px] font-medium text-[var(--store-muted)]">
-                {product.stock} available
-              </p>
-            )}
-          </div>
+  {product.stock > 0 && (
+    <p className="mt-2 text-[10px] font-medium text-[var(--store-muted)]">
+      {product.stock} available
+    </p>
+  )}
+</div>
         </button>
 
        <div className="mt-auto w-full px-3 pb-3 pt-3">

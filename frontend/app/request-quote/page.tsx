@@ -266,7 +266,7 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
                               aria-label={`Decrease quantity for ${item.product.name}`}
                               className="flex h-full w-9 items-center justify-center text-base text-[var(--store-ink)] transition hover:bg-[var(--store-soft)]"
                             >
-                              âˆ’
+                              a
                             </button>
 
                             <span className="flex h-full min-w-10 items-center justify-center border-x border-[var(--store-line)] px-2 text-xs font-bold text-[var(--store-ink)]">
