@@ -89,6 +89,20 @@ output = {
 # Ensure the directory exists
 os.makedirs(os.path.dirname(JSON_FILE), exist_ok=True)
 
+def clean_text(text):
+    if not text: return text
+    # Nuke the Mojibake
+    return (text
+        .replace("â€“", "–")
+        .replace("â€”", "—")
+        .replace("â€™", "’")
+        .replace("â€œ", "“")
+        .replace("â€", "”")
+        .replace("Ã©", "é")
+        .replace("Â ", " ")
+        .replace("Â", "")
+    )
+
 # Write the JSON file
 print(f"Writing {len(products)} products to {JSON_FILE}...")
 with open(JSON_FILE, mode='w', encoding='utf-8') as f:
