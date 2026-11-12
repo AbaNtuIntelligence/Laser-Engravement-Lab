@@ -287,3 +287,8 @@ a {
   background: var(--store-ink);
   color: white;
 }
+/* ZERO-GAP PRODUCT CAROUSELS */
+section.store-section[aria-roledescription="carousel"] {
+  padding-block: 0 !important;
+  margin-block: 0 !important;
+}
